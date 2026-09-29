@@ -54,3 +54,5 @@ if [[ -n "$build_artifacts" ]]; then
 else
   echo "none"
 fi
+echo
+"$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check-locale-sync.py" "$base_ref"

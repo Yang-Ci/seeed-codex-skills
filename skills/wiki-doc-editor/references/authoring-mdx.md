@@ -68,4 +68,6 @@ Unassembled instructions normally retain assembly media, precautions, and safety
 - Give links descriptive labels rather than unexplained raw URLs.
 - Use standard Chinese punctuation and sensible spacing around English product names and numbers.
 - Do not remove prerequisites, limitations, safety notes, or recovery steps to simplify presentation.
-- Preserve product spellings and platform capitalization used by the current repository. Examples include `Isaac Sim`, `MotorBridge`, `macOS`, `Windows`, `Ubuntu`, `Jetson`, `Raspberry Pi`, `Homebrew`, and `Rosetta 2`.
+- Apply the canonical spelling rules in [terminology-style.md](terminology-style.md) to front matter, headings, prose, navigation, captions, alt text, buttons, and ARIA labels.
+- Prefer the current official product or vendor spelling over accidental variants already present in the repository. Verify uncertain or potentially changed names against a primary official source rather than guessing from title case.
+- Preserve exact spellings inside commands, filenames, URLs, package names, API identifiers, environment variables, configuration keys, logs, and quotations when they are literal technical values.

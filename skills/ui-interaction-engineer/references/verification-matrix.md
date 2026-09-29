@@ -9,6 +9,7 @@ Use this reference before handing off a changed interaction. Select the relevant
 - Active/pressed state.
 - Transition in progress.
 - Expanded and collapsed state.
+- Default versus selected media geometry.
 - Overview, grid, or alternate layout.
 - Disabled, empty, loading, or error state when applicable.
 - State after rapid repeated input and after returning to the initial state.
@@ -38,6 +39,10 @@ Use this reference before handing off a changed interaction. Select the relevant
 - No clipped focus rings or interactive content.
 - No duplicate image layers, stale pseudo-elements, seams, or tearing.
 - Stable rounded corners throughout transforms.
+- Intrinsic aspect ratio remains correct; photographic media is not stretched.
+- `cover` crops only approved areas, while `contain` side space has an intentional fill.
+- Default cards do not begin at their expanded dimensions.
+- Zoomed media fits below persistent navigation and closes without activating its parent card.
 - Text remains readable over imagery and glass surfaces.
 - Side content remains attached to its intended item and does not overlap unrelated sections.
 - Final geometry is stable after animations and observers settle.
