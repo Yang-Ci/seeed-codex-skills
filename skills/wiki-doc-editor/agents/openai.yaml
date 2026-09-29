@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seeed Wiki Editor"
+  short_description: "Author, localize, validate, and ship Seeed Wiki changes"
+  default_prompt: "Use $wiki-doc-editor to update this Seeed Wiki, validate every affected locale, and prepare a clean repository handoff."

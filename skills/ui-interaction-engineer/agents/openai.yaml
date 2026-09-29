@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Interaction Engineer"
+  short_description: "Design and verify polished web UI interactions"
+  default_prompt: "Use $ui-interaction-engineer to design and implement this interface interaction with responsive, accessible motion."
