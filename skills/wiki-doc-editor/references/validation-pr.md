@@ -27,6 +27,10 @@ Before committing, pushing, or preparing a PR summary:
 
 The path checker is intentionally advisory. Do not block a valid language-only correction, and do not claim two pages are synchronized merely because both filenames appear in the diff; compare their affected facts, structure, media, links, and user-facing behavior.
 
+## New product homepage synchronization review
+
+For newly created or discovered product Wikis, follow [robotics-product-links.md](robotics-product-links.md) before handoff. Notify the user and automatically complete applicable local robotics homepage product links. Report completed links, already-present entries, justified exclusions, and unresolved mappings in the handoff or PR audit.
+
 ## Browser verification
 
 Use a browser preview when the request changes interaction, layout, responsiveness, theme behavior, or client-side state. Check the relevant subset of:

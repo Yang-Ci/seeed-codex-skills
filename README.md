@@ -6,7 +6,7 @@ Reusable Codex skills for Seeed Studio Wiki work and polished web UI interaction
 
 ### `wiki-doc-editor`
 
-Creates, edits, localizes, validates, and prepares pull requests for Seeed Studio Wiki Markdown/MDX documentation. It includes guidance for repository scope, bilingual structure and PR synchronization reminders, media presentation, official terminology and capitalization, builds, and PR audits.
+Creates, edits, localizes, validates, and prepares pull requests for Seeed Studio Wiki Markdown/MDX documentation. It includes guidance for repository scope, bilingual structure and PR synchronization reminders, automatic robotics homepage product-link synchronization for newly discovered product Wikis, media presentation, official terminology and capitalization, builds, and PR audits.
 
 ### `ui-interaction-engineer`
 

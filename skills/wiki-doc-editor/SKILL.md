@@ -36,6 +36,12 @@ Always read [references/repository-map.md](references/repository-map.md) before 
 - Before PR handoff, classify every changed localized page as shared-content, shared-label, or locale-only. If a Chinese source page changed without its English counterpart, explicitly report whether English synchronization is required, intentionally unnecessary, or cannot be resolved.
 - Before changing image presentation, define its role, frame, fit mode, radius owner, default and expanded sizes, zoom behavior, responsive rule, and visual verification boundary. Do not begin with a universal radius or aspect ratio.
 
+## Sync new product Wiki links to the robotics homepage
+
+When creating a product Wiki or discovering newly added product pages during change reviews or PR audits, check whether they belong in the robotics homepage product links. Review staged, unstaged, and untracked pages for local work, or the intended base/head diff for a branch or PR. Product pages may live outside `docs/Robotics/`.
+
+Follow [references/robotics-product-links.md](references/robotics-product-links.md). Tell the user that the new product Wiki needs homepage link synchronization, then automatically complete the applicable local source edits when the product and destination are clear. A reminder alone does not complete this workflow. Report completed synchronization or the concrete missing information.
+
 ## Validate proportionally
 
 - Review the exact diff and run `git diff --check`.
