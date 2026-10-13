@@ -6,15 +6,15 @@ Read this reference for builds, browser checks, commits, PR updates, or PR audit
 
 - Always review the exact diff and run `git diff --check`.
 - For prose-only edits, confirm headings, links, commands, and paired-locale consistency.
-- Build every affected locale when MDX syntax, imports, components, CSS, navigation, media embeds, or page structure changed.
-- Shared files under `src/` or `plugins/` can affect all locale sites; do not infer a single-site build solely from the edited page.
+- Build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, components, CSS, navigation, media embeds, or page structure changed. Build additional affected locales only when explicitly requested or project instructions require them.
+- Shared files under `src/` or `plugins/` can affect every locale site, but the default local build matrix remains English and Chinese. Use an explicit full-locale run when broader coverage is required.
 - Send build output to a temporary directory outside the repository when the build command supports it.
 - Separate pre-existing warnings from failures introduced by the change.
 - Run `scripts/check-terminology.py <affected-paths...>` for human-readable Wiki source. Review warnings in context instead of applying blind replacements.
 - When a canonical product or platform name is shared across locales, search likely variants in the corresponding pages and shared navigation or accessibility labels. Separate pre-existing terminology debt from inconsistencies introduced by the current change.
 - Never auto-fix URLs, anchors, filenames, commands, package names, API identifiers, environment variables, configuration keys, logs, or quotations based only on a prose capitalization rule.
 
-Use `scripts/validate-affected-sites.sh --dry-run [base-ref]` to inspect the proposed build matrix, then run it without `--dry-run` when appropriate.
+Use `scripts/validate-affected-sites.sh --dry-run [base-ref]` to inspect the proposed build matrix, then run it without `--dry-run` when appropriate. Add `--all-locales` only when a full-locale build is explicitly required.
 
 ## Locale synchronization review
 

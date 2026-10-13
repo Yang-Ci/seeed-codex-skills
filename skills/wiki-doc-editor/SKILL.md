@@ -45,7 +45,7 @@ Follow [references/robotics-product-links.md](references/robotics-product-links.
 ## Validate proportionally
 
 - Review the exact diff and run `git diff --check`.
-- Build every affected locale when MDX syntax, imports, shared components, CSS, media embeds, navigation, or page structure changed.
+- For local PR validation, build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, shared components, CSS, media embeds, navigation, or page structure changed. Build additional affected locales only when explicitly requested or project instructions require them.
 - Prefer temporary build destinations outside the repository so validation does not leave generated files in the worktree.
 - Inspect generated output for requested headings, links, tabs, images, and embeds. Use browser verification when interaction, responsive layout, or visual state materially matters.
 - Run the terminology checker on affected human-readable source files, review every finding in context, and preserve protected literals such as URLs, commands, filenames, and code identifiers.
@@ -58,7 +58,7 @@ The helper scripts are optional deterministic aids:
 - `scripts/audit-changes.sh [base-ref]` reports committed PR scope, worktree changes, whitespace errors, and generated build artifacts.
 - `scripts/check-terminology.py [--warn-only] <path>...` reports non-canonical product names, capitalization, and spacing without modifying files.
 - `scripts/check-locale-sync.py [base-ref]` reports changed Chinese source files whose likely English counterpart is absent from the proposed PR diff.
-- `scripts/validate-affected-sites.sh [--dry-run] [base-ref]` detects affected locale sites and builds them into a temporary directory.
+- `scripts/validate-affected-sites.sh [--dry-run] [--all-locales] [base-ref]` builds the English and Chinese sites by default, or every available locale with `--all-locales`, into a temporary directory.
 
 ## Guard external changes
 

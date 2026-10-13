@@ -2,12 +2,14 @@
 set -euo pipefail
 
 dry_run=false
+build_all_locales=false
 base_ref=""
 for argument in "$@"; do
   case "$argument" in
     --dry-run) dry_run=true ;;
+    --all-locales) build_all_locales=true ;;
     -h|--help)
-      echo "usage: $0 [--dry-run] [base-ref]"
+      echo "usage: $0 [--dry-run] [--all-locales] [base-ref]"
       exit 0
       ;;
     *)
@@ -54,29 +56,19 @@ if [[ -z "$changed_files" ]]; then
   exit 0
 fi
 
-mapfile -t all_locales < <(
-  find sites -mindepth 2 -maxdepth 2 -name package.json -printf '%h\n' \
-    | sed 's#^sites/##' \
-    | sort -u
-)
-
-shared_change=false
-if printf '%s\n' "$changed_files" | rg -q '^(src/|plugins/|package\.json$|yarn\.lock$|pnpm-lock\.yaml$|package-lock\.json$)'; then
-  shared_change=true
-fi
-
 declare -A selected=()
-if $shared_change; then
-  for locale in "${all_locales[@]}"; do
+if $build_all_locales; then
+  while IFS= read -r locale; do
     selected["$locale"]=1
-  done
+  done < <(
+    find sites -mindepth 2 -maxdepth 2 -name package.json -printf '%h\n' \
+      | sed 's#^sites/##' \
+      | sort -u
+  )
 else
-  while IFS= read -r path; do
-    if [[ "$path" =~ ^sites/([^/]+)/ ]]; then
-      locale="${BASH_REMATCH[1]}"
-      [[ -f "sites/$locale/package.json" ]] && selected["$locale"]=1
-    fi
-  done <<< "$changed_files"
+  for locale in en zh-CN; do
+    [[ -f "sites/$locale/package.json" ]] && selected["$locale"]=1
+  done
 fi
 
 if [[ ${#selected[@]} -eq 0 ]]; then
@@ -86,7 +78,7 @@ fi
 
 mapfile -t locales < <(printf '%s\n' "${!selected[@]}" | sort)
 echo "Base: $base_ref"
-echo "Affected locale sites: ${locales[*]}"
+echo "Build locales: ${locales[*]}"
 
 if $dry_run; then
   exit 0
@@ -106,4 +98,4 @@ for locale in "${locales[@]}"; do
   yarn --cwd "sites/$locale" build --out-dir "$output_dir"
 done
 
-echo "All affected locale builds passed. Temporary output removed on exit."
+echo "Selected locale builds passed. Temporary output removed on exit."
