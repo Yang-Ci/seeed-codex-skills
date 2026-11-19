@@ -9,11 +9,17 @@ Read this reference for prose, commands, front matter, headings, tabs, callouts,
 - Maintain exactly one H1. If a custom JSX H1 replaces the generated title, set `hide_title: true` and preserve the front matter `title` for metadata.
 - Split long installation or calibration procedures into numbered steps. Each step should state its purpose, action, and a useful verification signal.
 - Use existing shared components and page classes before creating one-off markup.
+- For a page-wide visual refresh, follow the established design of nearby related Wiki pages throughout the article, including purchase buttons, procedure steps, cards, and alignment. Preserve introductory platform sections explicitly requested by the user.
+- Give interactive cards and collapsible section headers a restrained hover response consistent with the page's existing interaction style. Keep keyboard focus visible, make hover and focus work in light and dark themes, respect reduced-motion preferences, and preserve native disclosure and link behavior.
+- In robotics Wiki pages using `rebot-wiki-style.css`, prefer the existing `rebot-buy-button-group` / `rebot-buy-button` pattern for purchase links when it matches nearby pages. Preserve each destination and localize the visible label; do not substitute it for platform, navigation, or other non-purchase links.
+- Check whether product images and purchase links repeat unnecessarily within the page. Remove redundant presentation when it serves no distinct context, while retaining images and links needed for separate platform tabs, steps, troubleshooting cases, or products.
 - In MDX, use React-compatible attributes such as `className` unless the surrounding component intentionally uses raw HTML conventions.
 
 ## Tabs and steps
 
 Use `Tabs` and `TabItem` for genuinely different hardware forms, operating systems, or installation paths. Tab values must be unique and stable; every tab must contain complete applicable instructions.
+
+For robotics tutorials that use the existing reBot design, use the numbered-circle `rebot-step-flow` pattern for multi-step installation, calibration, and other procedures when it fits the page. Apply it to each in-scope platform tab and requested locale, not only the first visible tab or introductory learning path. Keep commands, warnings, links, prerequisites, and step order intact; use an ordinary list when the step component would not suit the content.
 
 Typical step-flow structure:
 

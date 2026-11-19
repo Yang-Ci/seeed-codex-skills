@@ -45,9 +45,12 @@ Use a browser preview when the request changes interaction, layout, responsivene
 - A single intended bitmap layer with no stale background or pseudo-element copy.
 - Light and dark themes.
 - Keyboard focus and activation.
+- Hover and focus feedback on interactive cards and disclosure headers, including both expanded and collapsed states and reduced-motion behavior.
 - Pointer, drag, wheel, and scroll ownership.
 - Expanded, collapsed, loading, and empty states.
 - `prefers-reduced-motion` behavior.
+
+For a page-wide UI refresh, inspect beyond the first screen and the locations shown in user screenshots. Review each affected locale and relevant platform tab or disclosure, including the introductory platform section, purchase buttons, learning path, installation and other in-scope procedures, and recurring cards. Confirm text alignment, separation of titles and descriptions, and that the same product image or purchase entry is not repeated without a distinct purpose. Check desktop and narrow layouts, and use a common laptop width when sidebars affect the available article width. Verify that each button still points to the intended destination and that instructions and commands survive layout changes. State explicitly when browser, locale, tab, or viewport coverage was incomplete.
 
 For image or card presentation changes, test at least one wide, one common laptop, and one narrow viewport. Record mechanical measurements when visual inspection is unavailable, and do not claim that crop or composition looks correct unless it was actually inspected.
 
