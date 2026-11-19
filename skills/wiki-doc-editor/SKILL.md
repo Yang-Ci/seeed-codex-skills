@@ -28,6 +28,7 @@ Always read [references/repository-map.md](references/repository-map.md) before 
 ## Preserve scope and source
 
 - Inspect the target section, nearby conventions, shared components, and corresponding localized page before editing.
+- For a page-wide UI or CSS redesign, inventory the entire page and requested locale versions before editing, including purchase links, procedural steps, tabs, images, and repeated sections. Treat user screenshots as examples to investigate, not the full scope of the review. Keep narrow edits narrow.
 - Preserve unrelated or pre-existing changes. Do not revert or reformat them for convenience.
 - Make the smallest coherent change that achieves the requested outcome.
 - Edit source files, never generated `sites/<locale>/build/` output.
@@ -48,6 +49,7 @@ Follow [references/robotics-product-links.md](references/robotics-product-links.
 - For local PR validation, build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, shared components, CSS, media embeds, navigation, or page structure changed. Build additional affected locales only when explicitly requested or project instructions require them.
 - Prefer temporary build destinations outside the repository so validation does not leave generated files in the worktree.
 - Inspect generated output for requested headings, links, tabs, images, and embeds. Use browser verification when interaction, responsive layout, or visual state materially matters.
+- For page-wide visual changes, review the whole affected page and each requested locale, including tabbed or collapsed procedures, at desktop and narrow widths; report any states or viewports that could not be inspected.
 - Run the terminology checker on affected human-readable source files, review every finding in context, and preserve protected literals such as URLs, commands, filenames, and code identifiers.
 - Run the locale synchronization checker before commit or PR handoff. Treat its output as a required review decision, not an automatic instruction to translate every page.
 - For image presentation changes, verify intrinsic and rendered dimensions, aspect ratio, clipping layer, breakpoint behavior, duplicate layers, and default versus expanded geometry.
