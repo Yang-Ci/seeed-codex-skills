@@ -32,8 +32,7 @@ These are defaults to evaluate, not universal requirements.
 ## Size and aspect ratio
 
 - Reuse stable Seeed-hosted assets when suitable and record their intrinsic dimensions before choosing CSS.
-- Inline documentation images normally need `max-width: 100%` and automatic height so the source ratio is preserved.
-- Reserve layout space with intrinsic `width` and `height` attributes or `aspect-ratio` when possible to reduce layout shift.
+- For images displayed at their natural ratio, cap the width at the available space and use `height: auto`. Reserve space with proportional `width` and `height` attributes or `aspect-ratio`. Check that the computed height actually shrinks with the width in the article and its sidebar layout.
 - Do not use `width: 100%; height: 100%` or `background-size: 100% 100%` on photographic content unless distortion is explicitly intended.
 - Distinguish default and expanded geometry. A selectable card must not use its expanded dimensions before activation.
 - Set a readable maximum width for screenshots and diagrams instead of allowing an extremely large source to fill the article automatically. Derive the cap from the surrounding layout rather than hard-coding one value for every page.
@@ -74,7 +73,7 @@ These are defaults to evaluate, not universal requirements.
 For presentation changes, verify the relevant subset:
 
 - Final URL, HTTP success, file size, MIME type, intrinsic dimensions, and aspect ratio.
-- Computed rendered width and height at wide, laptop, and mobile widths.
+- Actual image decoding and visible pixels in the page or screenshot, along with the rendered width, height, and ratio at wide, laptop, and mobile widths. Wait for decoding before capturing a preview.
 - `object-fit`, background sizing, and focal position.
 - Radius and overflow on the actual clipping owner.
 - Default and expanded sizes before, during, and after transition.

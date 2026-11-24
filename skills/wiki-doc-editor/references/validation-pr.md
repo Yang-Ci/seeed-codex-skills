@@ -6,15 +6,20 @@ Read this reference for builds, browser checks, commits, PR updates, or PR audit
 
 - Always review the exact diff and run `git diff --check`.
 - For prose-only edits, confirm headings, links, commands, and paired-locale consistency.
-- Build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, components, CSS, navigation, media embeds, or page structure changed. Build additional affected locales only when explicitly requested or project instructions require them.
-- Shared files under `src/` or `plugins/` can affect every locale site, but the default local build matrix remains English and Chinese. Use an explicit full-locale run when broader coverage is required.
+- Build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, components, CSS, navigation, media embeds, or page structure changed.
 - Send build output to a temporary directory outside the repository when the build command supports it.
 - Separate pre-existing warnings from failures introduced by the change.
 - Run `scripts/check-terminology.py <affected-paths...>` for human-readable Wiki source. Review warnings in context instead of applying blind replacements.
 - When a canonical product or platform name is shared across locales, search likely variants in the corresponding pages and shared navigation or accessibility labels. Separate pre-existing terminology debt from inconsistencies introduced by the current change.
 - Never auto-fix URLs, anchors, filenames, commands, package names, API identifiers, environment variables, configuration keys, logs, or quotations based only on a prose capitalization rule.
 
-Use `scripts/validate-affected-sites.sh --dry-run [base-ref]` to inspect the proposed build matrix, then run it without `--dry-run` when appropriate. Add `--all-locales` only when a full-locale build is explicitly required.
+Use `scripts/validate-affected-sites.sh --dry-run [base-ref]` to see whether a build is needed and which base is used. Pass the intended base explicitly when validating a PR. The Git helpers otherwise try `upstream/docusaurus-version`, then `origin/docusaurus-version`, then `HEAD^` if present, and finally `HEAD`.
+
+## Tutorial structure check
+
+- Compare all in-scope procedures and reference data against the [layout rules](authoring-mdx.md#choose-a-layout-for-the-content). Check that sequences use consistent numbering, alternatives use sibling tabs, and field or feature tables have clear headings and readable cells at narrow widths.
+- Inspect every in-scope tab and disclosure in each edited locale, including non-default branches. Confirm step order, commands, links, prerequisites, and warnings survived the move. Compare tab values, labels, and procedure structure across paired edits.
+- In the browser, switch through each affected tab and open each affected disclosure. Check that the circular markers render and that all labels remain reachable at a narrow width. Report branches or viewports that could only be checked in source.
 
 ## Locale synchronization review
 
@@ -50,11 +55,16 @@ Use a browser preview when the request changes interaction, layout, responsivene
 - Expanded, collapsed, loading, and empty states.
 - `prefers-reduced-motion` behavior.
 
-For a page-wide UI refresh, inspect beyond the first screen and the locations shown in user screenshots. Review each affected locale and relevant platform tab or disclosure, including the introductory platform section, purchase buttons, learning path, installation and other in-scope procedures, and recurring cards. Confirm text alignment, separation of titles and descriptions, and that the same product image or purchase entry is not repeated without a distinct purpose. Check desktop and narrow layouts, and use a common laptop width when sidebars affect the available article width. Verify that each button still points to the intended destination and that instructions and commands survive layout changes. State explicitly when browser, locale, tab, or viewport coverage was incomplete.
+For a page-wide UI refresh, review each affected locale from the first screen through the last in-scope section. On the first screen, confirm the product image loads and the purchase or tool action uses the matching component and destination. In the rest of the page, check heading separation, tables, steps, tabs, disclosures, and recurring elements. Verify that instructions and commands survive layout changes, and disclose any viewport, locale, or component state that could only be checked in source.
 
 For image or card presentation changes, test at least one wide, one common laptop, and one narrow viewport. Record mechanical measurements when visual inspection is unavailable, and do not claim that crop or composition looks correct unless it was actually inspected.
 
 For complex UI behavior, use `ui-interaction-engineer` and its verification matrix in addition to this Wiki validation.
+
+## Local preview handoff
+
+- If the user gives a localhost URL or is already reviewing one, identify the worktree and locale served at that address. Open the exact route after the edit and confirm a visible change from the requested work before telling the user to refresh.
+- When testing in a separate worktree, identify that preview explicitly. Give its working route if available, or share a verified screenshot or diff. Apply the tested change in the preview's source worktree when the user asks to see it at their existing URL and the edit is within scope.
 
 ## Safe Git handoff
 

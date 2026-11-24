@@ -15,7 +15,14 @@ TEXT_EXTENSIONS = {".md", ".mdx", ".js", ".jsx", ".ts", ".tsx", ".json", ".yaml"
 SKIP_DIRECTORIES = {".git", ".docusaurus", "build", "node_modules"}
 MARKDOWN_EXTENSIONS = {".md", ".mdx"}
 URL_RE = re.compile(r"https?://[^\s)>\]}'\"]+")
-INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
+INLINE_CODE_RE = re.compile(r"(?<!`)(`+)(?!`).*?(?<!`)\1(?!`)")
+MARKDOWN_DESTINATION_RE = re.compile(
+    r"(?<=\]\()[ \t]*(?:<[^>\n]+>|(?:\\.|[^()\s\\]|\([^()\s]*\))+)"
+    r"|^\s*\[[^\]]+\]:[ \t]*(?:<[^>\n]+>|\S+)"
+)
+PATH_ATTRIBUTE_RE = re.compile(
+    r"""\b(?:href|src|to|id|srcSet|poster)\s*=\s*(?:\{\s*)?(["'])(.*?)\1""",
+)
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 FRONT_MATTER_KEY_RE = re.compile(r"^\s*([A-Za-z0-9_-]+)\s*:")
 PROTECTED_FRONT_MATTER_KEYS = {
@@ -35,35 +42,39 @@ class Rule:
 
 
 def term_rule(canonical: str, expression: str) -> Rule:
-    return Rule(canonical, re.compile(expression, re.IGNORECASE))
+    # Latin identifiers need word boundaries even when prose omits spaces around them.
+    boundary = r"[a-z0-9_]"
+    pattern = re.compile(rf"(?<!{boundary})(?:{expression})(?!{boundary})", re.IGNORECASE)
+    return Rule(canonical, pattern)
 
 
 RULES = (
-    term_rule("MuJoCo", r"(?<![\w])mujoco(?![\w])"),
-    term_rule("Isaac Sim", r"(?<![\w])isaac[\s_-]*sim(?![\w])"),
-    term_rule("Isaac Lab", r"(?<![\w])isaac[\s_-]*lab(?![\w])"),
-    term_rule("Isaac ROS", r"(?<![\w])isaac[\s_-]*ros(?![\w])"),
-    term_rule("NVIDIA", r"(?<![\w])nvidia(?![\w])"),
-    term_rule("ROS 2", r"(?<![\w])ros\s*2(?![\w])"),
-    term_rule("GitHub", r"(?<![\w])github(?![\w])"),
-    term_rule("JavaScript", r"(?<![\w])javascript(?![\w])"),
-    term_rule("TypeScript", r"(?<![\w])typescript(?![\w])"),
-    term_rule("PyTorch", r"(?<![\w])pytorch(?![\w])"),
-    term_rule("TensorFlow", r"(?<![\w])tensorflow(?![\w])"),
-    term_rule("OpenAI", r"(?<![\w])openai(?![\w])"),
-    term_rule("LeRobot", r"(?<![\w])lerobot(?![\w])"),
-    term_rule("Hugging Face", r"(?<![\w])hugging[\s_-]*face(?![\w])"),
-    term_rule("macOS", r"(?<![\w])mac[\s_-]*os(?![\w])"),
-    term_rule("Raspberry Pi", r"(?<![\w])raspberry[\s_-]*pi(?![\w])"),
-    term_rule("JetPack SDK", r"(?<![\w])jetpack\s+sdk(?![\w])"),
-    term_rule("Atom-S", r"(?<![\w])atom[\s_-]*s(?![\w])"),
-    term_rule("StackForce", r"(?<![\w])stackforce(?![\w])"),
-    term_rule("Seeed Studio", r"(?<![\w])seeed\s+studio(?![\w])"),
+    term_rule("MuJoCo", r"mujoco"),
+    term_rule("Isaac Sim", r"isaac[\s_-]*sim"),
+    term_rule("Isaac Lab", r"isaac[\s_-]*lab"),
+    term_rule("Isaac ROS", r"isaac[\s_-]*ros"),
+    term_rule("NVIDIA", r"nvidia"),
+    term_rule("ROS 2", r"ros\s*2"),
+    term_rule("GitHub", r"github"),
+    term_rule("JavaScript", r"javascript"),
+    term_rule("TypeScript", r"typescript"),
+    term_rule("PyTorch", r"pytorch"),
+    term_rule("TensorFlow", r"tensorflow"),
+    term_rule("OpenAI", r"openai"),
+    term_rule("LeRobot", r"lerobot"),
+    term_rule("Hugging Face", r"hugging[\s_-]*face"),
+    term_rule("macOS", r"mac[\s_-]*os"),
+    term_rule("Raspberry Pi", r"raspberry[\s_-]*pi"),
+    term_rule("JetPack SDK", r"jetpack\s+sdk"),
+    term_rule("Atom-S", r"atom[\s_-]*s"),
+    term_rule("StackForce", r"stackforce"),
+    term_rule("Seeed Studio", r"seeed\s+studio"),
 )
 
 
 def mask_pattern(text: str, pattern: re.Pattern[str]) -> str:
-    return pattern.sub(lambda match: " " * (match.end() - match.start()), text)
+    # Preserve columns and keep a multi-word term from matching across the mask.
+    return pattern.sub(lambda match: "\0" * len(match[0]), text)
 
 
 def source_files(paths: Iterable[str]) -> Iterable[tuple[str, str, str]]:
@@ -79,6 +90,7 @@ def source_files(paths: Iterable[str]) -> Iterable[tuple[str, str, str]]:
             continue
 
         path = Path(raw_path)
+        path.stat()
         candidates = (path.rglob("*") if path.is_dir() else (path,))
         for candidate in candidates:
             if not candidate.is_file() or candidate.suffix.lower() not in TEXT_EXTENSIONS:
@@ -89,18 +101,14 @@ def source_files(paths: Iterable[str]) -> Iterable[tuple[str, str, str]]:
             if resolved in seen:
                 continue
             seen.add(resolved)
-            try:
-                content = candidate.read_text(encoding="utf-8", errors="replace")
-            except OSError as error:
-                print(f"{candidate}: unable to read: {error}", file=sys.stderr)
-                continue
+            content = candidate.read_text(encoding="utf-8", errors="replace")
             yield str(candidate), candidate.suffix.lower(), content
 
 
 def scan_source(name: str, suffix: str, content: str) -> list[str]:
     findings: list[str] = []
     markdown = suffix in MARKDOWN_EXTENSIONS
-    fence_marker: str | None = None
+    fence: str | None = None
     front_matter = False
 
     for line_number, line in enumerate(content.splitlines(), start=1):
@@ -117,17 +125,23 @@ def scan_source(name: str, suffix: str, content: str) -> list[str]:
                     continue
 
             fence_match = FENCE_RE.match(line)
-            if fence_match:
-                marker = fence_match.group(1)[0]
-                if fence_marker is None:
-                    fence_marker = marker
-                elif marker == fence_marker:
-                    fence_marker = None
+            if fence is not None:
+                if (
+                    fence_match
+                    and fence_match[1].startswith(fence)
+                    and not line[fence_match.end():].strip()
+                ):
+                    fence = None
                 continue
-            if fence_marker is not None:
+            if fence_match:
+                fence = fence_match[1]
                 continue
 
-        masked = mask_pattern(mask_pattern(line, URL_RE), INLINE_CODE_RE)
+        masked = mask_pattern(line, PATH_ATTRIBUTE_RE)
+        if markdown:
+            masked = mask_pattern(masked, INLINE_CODE_RE)
+            masked = mask_pattern(masked, MARKDOWN_DESTINATION_RE)
+        masked = mask_pattern(masked, URL_RE)
         line_findings: list[tuple[int, str]] = []
         for rule in RULES:
             for match in rule.pattern.finditer(masked):
@@ -153,14 +167,18 @@ def main() -> int:
     parser.add_argument(
         "--warn-only",
         action="store_true",
-        help="print findings but exit successfully",
+        help="print terminology findings without failing (input errors still fail)",
     )
     parser.add_argument("paths", nargs="+", help="files or directories to scan; use - for stdin")
     args = parser.parse_args()
 
     findings: list[str] = []
-    for name, suffix, content in source_files(args.paths):
-        findings.extend(scan_source(name, suffix, content))
+    try:
+        for name, suffix, content in source_files(args.paths):
+            findings.extend(scan_source(name, suffix, content))
+    except OSError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
 
     for finding in findings:
         print(finding)

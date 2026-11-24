@@ -15,11 +15,37 @@ Read this reference for prose, commands, front matter, headings, tabs, callouts,
 - Check whether product images and purchase links repeat unnecessarily within the page. Remove redundant presentation when it serves no distinct context, while retaining images and links needed for separate platform tabs, steps, troubleshooting cases, or products.
 - In MDX, use React-compatible attributes such as `className` unless the surrounding component intentionally uses raw HTML conventions.
 
-## Tabs and steps
+## Robotics quick-start references
 
-Use `Tabs` and `TabItem` for genuinely different hardware forms, operating systems, or installation paths. Tab values must be unique and stable; every tab must contain complete applicable instructions.
+Use these two page pairs as the primary UI and layout references for robotics quick starts. Paths are relative to the Wiki repository root. Open the sections relevant to the requested changes and compare the corresponding locale when editing both.
 
-For robotics tutorials that use the existing reBot design, use the numbered-circle `rebot-step-flow` pattern for multi-step installation, calibration, and other procedures when it fits the page. Apply it to each in-scope platform tab and requested locale, not only the first visible tab or introductory learning path. Keep commands, warnings, links, prerequisites, and step order intact; use an ordinary list when the step component would not suit the content.
+| Reference | English source | Chinese source |
+| --- | --- | --- |
+| SO-ARM100 / SO-ARM101 with LeRobot | `sites/en/docs/Robotics/Robot_Kits/Lerobot/Lerobot_SO100Arm_New.md` | `sites/zh-CN/docs/Robotics/Robot_Kits/Lerobot/cn_Lerobot_SO100Arm_New.md` |
+| reBot Arm B601-RS Quick Start | `sites/en/docs/Robotics/Robot_Kits/reBot_Arm/B601_RS/reBot_Arm_B601_RS_Getting_Started.md` | `sites/zh-CN/docs/Robotics/Robot_Kits/reBot_Arm/B601_RS/cn_reBot_Arm_B601_RS_Getting_Started.md` |
+
+- **Product introduction.** On a full refresh to match these pages, compare the title, visible product image, centered purchase action, and any platform or tool information relevant to the reader. Reuse the matching product image in the page body and replace legacy purchase markup with `rebot-buy-button-group` / `rebot-buy-button` in each affected locale. Keep existing purchase destinations, source any missing locale destination from the same product's reference page, and localize the labels. The SO-ARM `sensecraft-banner` is an example for a relevant software entry and guide. Preserve separate purchase and tool actions when both belong on the target page.
+- **Learning path and platform installs.** Use SO-ARM's **Recommended Learning Path** for numbered navigation cards that link to later sections. Its `soarm-learning-path` layout is defined in `src/css/soarm101-pinocchio-style.css`. Use the **Install LeRobot** section as the example for peer Jetson and Ubuntu x86 tabs, each with its own vertical circular step flow.
+- **Hardware, setup, and calibration.** Use B601-RS's **Assembly Guide** for assembled and unassembled variants inside one step, and **Connect the Arms** and **Software Setup and Calibration Workflow** for vertical numbered procedures. Use the latter section's OS tabs and `rebot-demo-details` disclosure for platform-specific setup and longer supporting instructions. Keep safety notices visible where readers need them.
+- Reuse the applicable patterns from `src/css/rebot-wiki-style.css`. Use the SO-ARM-specific learning path style for section navigation where it fits. Apply the [layout rules below](#choose-a-layout-for-the-content) to the target's own sequence and options.
+
+## Choose a layout for the content
+
+Inspect the target page and the relevant section of a [quick-start reference](#robotics-quick-start-references) or a related tutorial. For a page-wide tutorial rewrite, classify groups across the whole page, including inside existing tabs and disclosures.
+
+| What the reader needs to do | Layout |
+| --- | --- |
+| Complete several actions in order, such as connect → configure → verify | On a tutorial that uses the reBot design, reuse `rebot-step-flow`. On other pages, use the established step component or a numbered list. |
+| Choose one applicable version, platform, or method for the same task, such as Ubuntu x86 / Jetson Orin or prebuilt package / source build | Put the alternatives in one `Tabs` group with a peer `TabItem` for each choice. |
+| Choose a path, then complete several actions | Put the step flow inside each applicable tab. If only one step differs, keep the overall flow and put the tabs inside that step. |
+| Look up labels such as `Pos`, `V`, and `Status`, compare specs, or scan a set of tools and their uses | Use a compact Markdown table with descriptive columns such as **Field / Meaning** or **Tool / Purpose**. |
+| See prerequisites or shared information | Keep it visible in a list or section. |
+
+- Use a real ordered list for short action sequences. Give a lookup table its own descriptive heading and keep exact UI labels in the first column. Put operational cautions next to the relevant action.
+- Reuse `/src/css/rebot-wiki-style.css` and the existing `rebot-step-flow`, `rebot-step-item`, `rebot-step-number`, and `rebot-step-content` markup. Follow the nearest tutorial's numbering and label convention. Apply it to comparable procedures throughout the requested scope, including non-default tabs. Keep short substeps as lists inside a step.
+- Reuse the page's existing Tabs component or import `Tabs` from `@theme/Tabs` and `TabItem` from `@theme/TabItem`. Give peer tabs unique, stable values and localize the labels. Each tab must contain the commands, warnings, media, and verification that apply to that choice. Keep truly shared prerequisites and steps visible outside the group.
+- In paired edits, keep the tab order, values, and step structure aligned. Preserve existing explicit heading IDs and incoming links when moving content into tabs.
+- For additional examples of a specific pattern, see the **Install Isaac Sim** section of `reBot_Arm_B601_RS_isaacsim.md` for alternative installation methods and **Initial System Environment** in `reBot_Arm_B601_DM_Lerobot.md` for sibling platform tabs.
 
 Typical step-flow structure:
 
@@ -70,7 +96,7 @@ Unassembled instructions normally retain assembly media, precautions, and safety
 ## Writing conventions
 
 - Write concise, direct instructions with focused paragraphs.
-- Use ordered lists for sequences and tables for comparisons, not for long procedures.
+- Use lists, tables, and procedure components according to the [layout rules above](#choose-a-layout-for-the-content).
 - Give links descriptive labels rather than unexplained raw URLs.
 - Use standard Chinese punctuation and sensible spacing around English product names and numbers.
 - Do not remove prerequisites, limitations, safety notes, or recovery steps to simplify presentation.

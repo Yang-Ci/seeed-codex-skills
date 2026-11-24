@@ -19,6 +19,7 @@ Produce accurate, localized, buildable Seeed Wiki changes while preserving the u
 Always read [references/repository-map.md](references/repository-map.md) before editing or auditing a Seeed Wiki repository.
 
 - For prose, MDX structure, commands, tabs, headings, or front matter, read [references/authoring-mdx.md](references/authoring-mdx.md).
+- For robotics quick-start UI and layout, use the [SO-ARM and reBot B601-RS reference pages](references/authoring-mdx.md#robotics-quick-start-references) for the relevant parts of the page.
 - For official product names, capitalization, spacing, acronyms, navigation labels, alt text, or ARIA terminology, read [references/terminology-style.md](references/terminology-style.md).
 - For paired pages, translated content, or shared labels across locales, read [references/localization.md](references/localization.md).
 - For images, video, remote uploads, asset URLs, image sizing, rounded corners, crop, or zoom behavior, read [references/media-assets.md](references/media-assets.md).
@@ -28,11 +29,12 @@ Always read [references/repository-map.md](references/repository-map.md) before 
 ## Preserve scope and source
 
 - Inspect the target section, nearby conventions, shared components, and corresponding localized page before editing.
-- For a page-wide UI or CSS redesign, inventory the entire page and requested locale versions before editing, including purchase links, procedural steps, tabs, images, and repeated sections. Treat user screenshots as examples to investigate, not the full scope of the review. Keep narrow edits narrow.
+- For a page-wide UI or layout request, compare the target and reference from the product introduction through the last section. Check the main image, purchase and tool actions, procedures, alternatives, and reference data in each requested locale. Use screenshots to locate issues and keep explicitly local edits within scope.
 - Preserve unrelated or pre-existing changes. Do not revert or reformat them for convenience.
 - Make the smallest coherent change that achieves the requested outcome.
 - Edit source files, never generated `sites/<locale>/build/` output.
 - Reuse established imports, components, CSS tokens, media patterns, and navigation structures.
+- When creating or restructuring a tutorial, follow the [layout rules](references/authoring-mdx.md#choose-a-layout-for-the-content). On reBot-style pages, use the shared circular steps for procedures. Use sibling Tabs for alternative paths to the same task and tables for fields, specs, and concise feature descriptions.
 - Do not modify additional locales merely because they exist. Synchronize them only when the requested content or a shared label genuinely applies.
 - Before PR handoff, classify every changed localized page as shared-content, shared-label, or locale-only. If a Chinese source page changed without its English counterpart, explicitly report whether English synchronization is required, intentionally unnecessary, or cannot be resolved.
 - Before changing image presentation, define its role, frame, fit mode, radius owner, default and expanded sizes, zoom behavior, responsive rule, and visual verification boundary. Do not begin with a universal radius or aspect ratio.
@@ -46,21 +48,22 @@ Follow [references/robotics-product-links.md](references/robotics-product-links.
 ## Validate proportionally
 
 - Review the exact diff and run `git diff --check`.
-- For local PR validation, build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, shared components, CSS, media embeds, navigation, or page structure changed. Build additional affected locales only when explicitly requested or project instructions require them.
+- For local PR validation, build the English and Chinese (`zh-CN`) sites when MDX syntax, imports, shared components, CSS, media embeds, navigation, or page structure changed.
 - Prefer temporary build destinations outside the repository so validation does not leave generated files in the worktree.
 - Inspect generated output for requested headings, links, tabs, images, and embeds. Use browser verification when interaction, responsive layout, or visual state materially matters.
-- For page-wide visual changes, review the whole affected page and each requested locale, including tabbed or collapsed procedures, at desktop and narrow widths; report any states or viewports that could not be inspected.
+- When the user is reviewing a local preview, [verify the actual URL](references/validation-pr.md#local-preview-handoff) and confirm it serves the edited worktree and locale.
+- For tutorial structure changes, apply the [steps and Tabs checks](references/validation-pr.md#tutorial-structure-check), including every in-scope branch. For page-wide visual changes, review the whole affected page and each requested locale at desktop and narrow widths.
 - Run the terminology checker on affected human-readable source files, review every finding in context, and preserve protected literals such as URLs, commands, filenames, and code identifiers.
 - Run the locale synchronization checker before commit or PR handoff. Treat its output as a required review decision, not an automatic instruction to translate every page.
 - For image presentation changes, verify intrinsic and rendered dimensions, aspect ratio, clipping layer, breakpoint behavior, duplicate layers, and default versus expanded geometry.
 - Distinguish local validation, remote CI, pre-existing warnings, and new failures. Never report a pending check as passed.
 
-The helper scripts are optional deterministic aids:
+Use the helpers when the corresponding checks above apply. The branch inventory is useful for full PR audits:
 
 - `scripts/audit-changes.sh [base-ref]` reports committed PR scope, worktree changes, whitespace errors, and generated build artifacts.
 - `scripts/check-terminology.py [--warn-only] <path>...` reports non-canonical product names, capitalization, and spacing without modifying files.
 - `scripts/check-locale-sync.py [base-ref]` reports changed Chinese source files whose likely English counterpart is absent from the proposed PR diff.
-- `scripts/validate-affected-sites.sh [--dry-run] [--all-locales] [base-ref]` builds the English and Chinese sites by default, or every available locale with `--all-locales`, into a temporary directory.
+- `scripts/validate-affected-sites.sh [--dry-run] [base-ref]` builds the English and Chinese sites into a temporary directory.
 
 ## Guard external changes
 
