@@ -64,14 +64,14 @@ def default_base(repo: Path) -> str:
 
 def changed_paths(repo: Path, base_ref: str) -> set[str]:
     commands = (
-        ("diff", "--name-only", f"{base_ref}...HEAD"),
-        ("diff", "--cached", "--name-only"),
-        ("diff", "--name-only"),
-        ("ls-files", "--others", "--exclude-standard"),
+        ("diff", "--no-renames", "--name-only", "-z", f"{base_ref}...HEAD"),
+        ("diff", "--cached", "--no-renames", "--name-only", "-z"),
+        ("diff", "--no-renames", "--name-only", "-z"),
+        ("ls-files", "--others", "--exclude-standard", "-z"),
     )
     paths: set[str] = set()
     for command in commands:
-        paths.update(line for line in git(repo, *command).splitlines() if line)
+        paths.update(path for path in git(repo, *command).split("\0") if path)
     return paths
 
 
@@ -134,7 +134,10 @@ def main() -> int:
             continue
 
         candidates = english_candidates(changed_path)
-        counterpart = next((item for item in candidates if existing_or_tracked(repo, item)), None)
+        counterpart = next(
+            (item for item in candidates if item in changed or existing_or_tracked(repo, item)),
+            None,
+        )
         if counterpart and counterpart in changed:
             continue
         reminders.append((changed_path, counterpart))

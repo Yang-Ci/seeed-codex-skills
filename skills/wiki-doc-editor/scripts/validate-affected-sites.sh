@@ -2,15 +2,17 @@
 set -euo pipefail
 
 dry_run=false
-build_all_locales=false
 base_ref=""
 for argument in "$@"; do
   case "$argument" in
     --dry-run) dry_run=true ;;
-    --all-locales) build_all_locales=true ;;
     -h|--help)
-      echo "usage: $0 [--dry-run] [--all-locales] [base-ref]"
+      echo "usage: $0 [--dry-run] [base-ref]"
       exit 0
+      ;;
+    -*)
+      echo "error: unknown option '$argument'" >&2
+      exit 2
       ;;
     *)
       if [[ -n "$base_ref" ]]; then
@@ -33,6 +35,8 @@ if [[ -z "$base_ref" ]]; then
     base_ref="upstream/docusaurus-version"
   elif git show-ref --verify --quiet refs/remotes/origin/docusaurus-version; then
     base_ref="origin/docusaurus-version"
+  elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+    base_ref="HEAD^"
   else
     base_ref="HEAD"
   fi
@@ -44,40 +48,26 @@ git rev-parse --verify "$base_ref^{commit}" >/dev/null 2>&1 || {
 }
 
 changed_files="$({
-  git diff --name-only "$base_ref"...HEAD
-  git diff --cached --name-only
-  git diff --name-only
+  git diff --name-only "$base_ref"...HEAD &&
+  git diff --cached --name-only &&
+  git diff --name-only &&
   git ls-files --others --exclude-standard
 } | sed '/^$/d' | sort -u)"
 
 changed_files="$(printf '%s\n' "$changed_files" | rg -v '^sites/[^/]+/build(/|$)' || true)"
+echo "Base: $base_ref"
 if [[ -z "$changed_files" ]]; then
   echo "No source changes detected."
   exit 0
 fi
 
-declare -A selected=()
-if $build_all_locales; then
-  while IFS= read -r locale; do
-    selected["$locale"]=1
-  done < <(
-    find sites -mindepth 2 -maxdepth 2 -name package.json -printf '%h\n' \
-      | sed 's#^sites/##' \
-      | sort -u
-  )
-else
-  for locale in en zh-CN; do
-    [[ -f "sites/$locale/package.json" ]] && selected["$locale"]=1
-  done
-fi
-
-if [[ ${#selected[@]} -eq 0 ]]; then
-  echo "No affected locale site detected."
-  exit 0
-fi
-
-mapfile -t locales < <(printf '%s\n' "${!selected[@]}" | sort)
-echo "Base: $base_ref"
+locales=(en zh-CN)
+for locale in "${locales[@]}"; do
+  if [[ ! -f "sites/$locale/package.json" ]]; then
+    echo "error: sites/$locale/package.json is required for validation" >&2
+    exit 2
+  fi
+done
 echo "Build locales: ${locales[*]}"
 
 if $dry_run; then
